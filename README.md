@@ -62,6 +62,12 @@ doWhaterever($email->from, $email->subject, $email->body);
 ?>
 ```
 
+## Footnotes
+
+In order to write these classes, I had a lot of reading of other people's work and I would like to thank the following repository owners.
+
+- [eXorus](https://github.com/eXorus) for [php-mime-mail-parser](https://github.com/php-mime-mail-parser/php-mime-mail-parser)
+
 ## Author
 
 Jonathan Roy, web developper at [OptimumWeb](http://optimumweb.ca)
