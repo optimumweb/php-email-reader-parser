@@ -123,10 +123,13 @@ class Email_Parser
                 }
             }
         } elseif ( !isset($body_part->disposition) || $body_part->disposition == 'inline' ) {
-            if ( $mime_type == 'text/plain' ) {
-                $this->body .= $body_part->body . "\n"; // Gather all plain/text which doesn't have an inline or attachment disposition
-            } elseif ( $mime_type == 'text/html' ) {
-                $this->html .= $body_part->body . "\n"; // Gather all text/html which doesn't have an inline or attachment disposition
+            switch ( $mime_type ) {
+                case 'text/plain':
+                    $this->body .= $body_part->body . "\n";
+                    break;
+                case 'text/html':
+                    $this->html .= $body_part->body . "\n";
+                    break;
             }
         } else {
             if ( empty($this->allowed_mime_types) || in_array($mime_type, $this->allowed_mime_types) ) {
