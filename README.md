@@ -8,8 +8,8 @@ It does something that should be so simple but turns out to be very complex usin
 
 - PHP 5.4+
 - PEAR Mail_mimeDecode package
-- PHP IMAP functions
-- PHP mb_convert_encoding
+- PHP IMAP extension
+- PHP mbstring extension (mb_convert_encoding)
 
 ## Installation
 
