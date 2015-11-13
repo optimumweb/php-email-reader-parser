@@ -10,8 +10,6 @@
     },
     "minimum-stability": "dev",
     "autoload": {
-        "psr-0": {
-            "": [ "email_parser.php", "email_reader.php" ]
-        }
+        "files": [ "email_parser.php", "email_reader.php" ]
     }
 }
