@@ -6,7 +6,7 @@
         "php": ">=5.4.0",
         "ext-imap": "*",
         "ext-mbstring": "*",
-        "optimumweb/mail_mime-decode": "*"
+        "optimumweb/mail_mime-decode": "dev-PHP_4_0_7"
     },
     "autoload": {
         "psr-0": {

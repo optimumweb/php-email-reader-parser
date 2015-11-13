@@ -1,7 +1,5 @@
 <?php
 
-require_once('Mail/mimeDecode.php');
-
 class Email_Parser
 {
     private $allowed_mime_types    = [];
