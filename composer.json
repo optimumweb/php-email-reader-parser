@@ -8,6 +8,7 @@
         "ext-mbstring": "*",
         "optimumweb/mail_mime-decode": "dev-PHP_4_0_7"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-0": {
             "": [ "email_parser.php", "email_reader.php" ]
