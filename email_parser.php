@@ -4,7 +4,8 @@ require_once('Mail/mimeDecode.php');
 
 class Email_Parser
 {
-    private $allowed_mime_types = [ 'audio/wave', 'application/pdf', 'application/zip', 'application/octet-stream', 'image/jpeg', 'image/png', 'image/gif' ];
+    private $allowed_mime_types    = [];
+    private $disallowed_mime_types = [];
 
     private $charset = 'UTF-8';
 
@@ -67,7 +68,7 @@ class Email_Parser
         }
 
         // We might also have uuencoded files. Check for those.
-        if ( !isset($this->body) ) {
+        if ( empty($this->body) ) {
             if ( isset($this->decoded->body) ) {
                 $this->body = $this->decoded->body;
             } else {
@@ -124,8 +125,12 @@ class Email_Parser
             if( !isset($body_part->disposition) || $body_part->disposition == 'inline' ) {
                 $this->body .= $body_part->body . "\n"; // Gather all plain/text which doesn't have an inline or attachment disposition
             }
-        } elseif ( in_array($mime_type, $this->allowed_mime_types) ) {
-            $this->save_attachment($filename, $body_part->body, $mime_type);
+        } else {
+            if ( empty($this->allowed_mime_types) || in_array($mime_type, $this->allowed_mime_types) ) {
+                if ( empty($this->disallowed_mime_types) || !in_array($mime_type, $this->disallowed_mime_types) ) {
+                    $this->save_attachment($filename, $body_part->body, $mime_type);
+                }
+            }
         }
     }
 
