@@ -5,11 +5,10 @@
     "require": {
         "php": ">=5.4.0",
         "ext-imap": "*",
-        "ext-mbstring": "*",
-        "optimumweb/mail_mime-decode": "dev-PHP_4_0_7"
+        "ext-mbstring": "*"
     },
     "minimum-stability": "dev",
     "autoload": {
-        "files": [ "email_parser.php", "email_reader.php" ]
+        "files": [ "mimeDecode.php", "email_parser.php", "email_reader.php" ]
     }
 }
