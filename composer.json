@@ -4,7 +4,7 @@
     "description": "PHP Email Reader (using IMAP) and Parser (using mimeDecode)",
     "require": {
         "php": ">=5.4.0",
-        "pear/mail": "*",
+        "pear/mail": "dev-master",
         "ext-imap": "*",
         "ext-mbstring": "*"
     },
