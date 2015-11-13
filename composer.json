@@ -5,12 +5,12 @@
     "repositories": [
         {
             "type": "pear",
-            "url": "pear.php.net"
+            "url": "https://pear.php.net"
         }
     ],
     "require": {
         "php": ">=5.4.0",
-        "pear-pear/Mail_mimeDecode": "*",
+        "pear-pear/PEAR_Mail": "*",
         "ext-imap": "*",
         "ext-mbstring": "*"
     },
