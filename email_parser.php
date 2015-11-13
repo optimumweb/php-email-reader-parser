@@ -19,6 +19,7 @@ class Email_Parser
     public $subject     = null;
     public $date        = null;
     public $body        = "";
+    public $html        = "";
     public $attachments = [];
 
     public function __construct($raw = null)
@@ -124,6 +125,10 @@ class Email_Parser
         } elseif ( $mime_type == 'text/plain' ) {
             if( !isset($body_part->disposition) || $body_part->disposition == 'inline' ) {
                 $this->body .= $body_part->body . "\n"; // Gather all plain/text which doesn't have an inline or attachment disposition
+            }
+        } elseif ( $mime_type == 'text/html' ) {
+            if( !isset($body_part->disposition) || $body_part->disposition == 'inline' ) {
+                $this->html .= $body_part->body . "\n"; // Gather all text/html which doesn't have an inline or attachment disposition
             }
         } else {
             if ( empty($this->allowed_mime_types) || in_array($mime_type, $this->allowed_mime_types) ) {
