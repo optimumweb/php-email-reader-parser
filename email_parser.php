@@ -122,14 +122,6 @@ class Email_Parser
                     $this->decode_part($sub_part);
                 }
             }
-        } elseif ( $mime_type == 'text/plain' ) {
-            if( !isset($body_part->disposition) || $body_part->disposition == 'inline' ) {
-                $this->body .= $body_part->body . "\n"; // Gather all plain/text which doesn't have an inline or attachment disposition
-            }
-        } elseif ( $mime_type == 'text/html' ) {
-            if( !isset($body_part->disposition) || $body_part->disposition == 'inline' ) {
-                $this->html .= $body_part->body . "\n"; // Gather all text/html which doesn't have an inline or attachment disposition
-            }
         } else {
             if ( empty($this->allowed_mime_types) || in_array($mime_type, $this->allowed_mime_types) ) {
                 if ( empty($this->disallowed_mime_types) || !in_array($mime_type, $this->disallowed_mime_types) ) {
