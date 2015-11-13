@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "pear-pear.php.net/Mail": "*",
+        "pear-pear.php.net/Mail_mimeDecode": "*",
         "ext-imap": "*",
         "ext-mbstring": "*"
     },
