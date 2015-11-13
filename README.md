@@ -7,7 +7,7 @@ It does something that should be so simple but turns out to be very complex usin
 ## Requirements
 
 - PHP 5.4+
-- PEAR Mail_mimeDecode package
+- PHP PEAR
 - PHP IMAP extension
 - PHP mbstring extension (mb_convert_encoding)
 
