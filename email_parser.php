@@ -144,13 +144,15 @@ class Email_Parser
     {
         $filename = mb_convert_encoding($filename, $this->charset, $this->charset);
 
+        $dot_ext = '.'.self::get_file_extension($filename);
+
         $unlocked_and_unique = false;
         $i = 0;
 
         while ( !$unlocked_and_unique && $i++ < 10 ) {
 
             $name = uniqid('email_attachment_');
-            $path = sys_get_temp_dir() . '/' . $name;
+            $path = sys_get_temp_dir() . '/' . $name . $dot_ext;
 
             // Attempt to lock
             $outfile = fopen($path, 'w');
@@ -190,5 +192,16 @@ class Email_Parser
         $bytes /= pow(1024, $pow);
 
         return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
+    private static function get_file_extension($filename)
+    {
+        if ( substr($filename, 0, 1) == '.' ) {
+            return substr($filename, 1);
+        }
+        $pieces = explode('.', $filename);
+        if ( count($pieces) > 1 ) {
+            return strtolower(array_pop($pieces));
+        }
     }
 }
