@@ -64,7 +64,10 @@ class Email_Parser
                 $filename = 'file';
             }
 
-            $this->save_attachment($filename, $this->decoded->body, $mime_type);
+            if ( $this->is_valid_attachment($mime_type) ) {
+                $this->save_attachment($filename, $this->decoded->body, $mime_type);
+            }
+
             $this->body = "";
         }
 
@@ -130,14 +133,26 @@ class Email_Parser
                 case 'text/html':
                     $this->html .= $body_part->body . "\n";
                     break;
+                default:
+                    if ( $this->is_valid_attachment($mime_type) ) {
+                        $this->save_attachment($filename, $body_part->body, $mime_type);
+                    }
             }
         } else {
-            if ( empty($this->allowed_mime_types) || in_array($mime_type, $this->allowed_mime_types) ) {
-                if ( empty($this->disallowed_mime_types) || !in_array($mime_type, $this->disallowed_mime_types) ) {
-                    $this->save_attachment($filename, $body_part->body, $mime_type);
-                }
+            if ( $this->is_valid_attachment($mime_type) ) {
+                $this->save_attachment($filename, $body_part->body, $mime_type);
             }
         }
+    }
+
+    private function is_valid_attachment($mime_type)
+    {
+        if ( empty($this->allowed_mime_types) || in_array($mime_type, $this->allowed_mime_types) ) {
+            if ( empty($this->disallowed_mime_types) || !in_array($mime_type, $this->disallowed_mime_types) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function save_attachment($filename, $contents, $mime_type = 'unknown')
