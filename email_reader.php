@@ -40,12 +40,18 @@ class Email_Reader
         }
     }
 
-    // move the message to a new folder
-    function move($uid, $folder = 'INBOX.Processed')
+    // move the message to a folder
+    function move($uid, $folder)
     {
-        if ( imap_mail_move($this->stream, $uid, $folder, CP_UID) ) {
-            imap_expunge($this->stream);
-            return true;
+        $tries = 0;
+
+        while ( $tries++ < 3 ) {
+            if ( imap_mail_move($this->stream, $uid, $folder, CP_UID) ) {
+                imap_expunge($this->stream);
+                return true;
+            } else {
+                sleep(1);
+            }
         }
 
         return false;
