@@ -201,11 +201,12 @@ class Email_Parser
         if ( !empty($this->body) ) {
             return $this->body;
         } elseif ( !empty($this->html) ) {
-            $plain  = strip_tags($this->html, '<style>');
-            $substr = substr($plain, strpos($plain, "<style"), strpos($plain, "</style>") + 2);
-            $plain  = str_replace($substr, "", $plain);
-            $plain  = str_replace([ "\t", "\r", "\n" ], "", $plain);
-            return trim($plain);
+            $plain  = strip_tags($this->html, '<style>'); // remove all tags but style tags
+            $substr = substr($plain, strpos($plain, "<style"), strpos($plain, "</style>") + 2); // take care of style tags manually to remove inline css
+            $plain  = str_replace($substr, "", $plain); // remove all css
+            $plain  = str_replace([ "\t" ], "", $plain); // remove tabs
+            $plain  = preg_replace("/\n\n+/", "\n\n", $plain); // remove excessive line-breaks that come from stripping tags
+            return trim($plain); // trim extra white-space
         }
     }
 
