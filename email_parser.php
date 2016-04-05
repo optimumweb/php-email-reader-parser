@@ -128,10 +128,10 @@ class Email_Parser
         } elseif ( !isset($body_part->disposition) || $body_part->disposition == 'inline' ) {
             switch ( $mime_type ) {
                 case 'text/plain':
-                    $this->body .= $body_part->body . "\n";
+                    $this->body .= mb_convert_encoding($body_part->body, $this->charset, $this->charset) . "\n";
                     break;
                 case 'text/html':
-                    $this->html .= $body_part->body . "\n";
+                    $this->html .= mb_convert_encoding($body_part->body, $this->charset, $this->charset) . "\n";
                     break;
                 default:
                     if ( $this->is_valid_attachment($mime_type) ) {
