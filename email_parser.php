@@ -119,7 +119,7 @@ class Email_Parser
             print "Found body part type $mime_type\n";
         }
 
-        if ( in_array($body_part->ctype_primary, [ 'multipart', 'multipart/mixed' ]) ) {
+        if ( $body_part->ctype_primary == 'multipart' ) {
             if ( is_array($body_part->parts) ) {
                 foreach ( $body_part->parts as $ix => $sub_part ) {
                     $this->decode_part($sub_part);
@@ -131,6 +131,7 @@ class Email_Parser
                     $this->body .= $body_part->body . "\n";
                     break;
                 case 'text/html':
+                    $this->body .= strip_tags($body_part->body) . "\n";
                     $this->html .= $body_part->body . "\n";
                     break;
                 default:
