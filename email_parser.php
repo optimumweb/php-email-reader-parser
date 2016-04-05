@@ -196,6 +196,19 @@ class Email_Parser
         }
     }
 
+    public function plain()
+    {
+        if ( !empty($this->body) ) {
+            return $this->body;
+        } elseif ( !empty($this->html) ) {
+            $plain  = strip_tags($this->html, '<style>');
+            $substr = substr($plain, strpos($plain, "<style"), strpos($plain, "</style>") + 2);
+            $plain  = str_replace($substr, "", $plain);
+            $plain  = str_replace([ "\t", "\r", "\n" ], "", $plain);
+            return trim($plain);
+        }
+    }
+
     private function format_bytes($bytes, $precision = 2)
     {
         $units = [ 'B', 'KB', 'MB', 'GB', 'TB' ];
