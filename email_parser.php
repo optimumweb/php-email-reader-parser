@@ -131,7 +131,6 @@ class Email_Parser
                     $this->body .= $body_part->body . "\n";
                     break;
                 case 'text/html':
-                    $this->body .= strip_tags($body_part->body) . "\n";
                     $this->html .= $body_part->body . "\n";
                     break;
                 default:
