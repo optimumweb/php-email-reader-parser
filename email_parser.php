@@ -195,9 +195,13 @@ class Email_Parser
     public function plain()
     {
         if ( !empty($this->body) ) {
-            return $this->body;
+            $text = $this->body;
         } elseif ( !empty($this->html) ) {
-            $plain  = strip_tags($this->html, '<style>'); // remove all tags but style tags
+            $text = $this->html;
+        }
+
+        if ( !empty($text) ) {
+            $plain  = strip_tags($text, '<style>'); // remove all tags but style tags
             $substr = substr($plain, strpos($plain, "<style"), strpos($plain, "</style>") + 2); // take care of style tags manually to remove inline css
             $plain  = str_replace($substr, "", $plain); // remove all css
             $plain  = str_replace([ "\t" ], "", $plain); // remove tabs
