@@ -73,11 +73,7 @@ class Email_Parser
 
         // We might also have uuencoded files. Check for those.
         if ( empty($this->body) ) {
-            if ( isset($this->decoded->body) ) {
-                $this->body = $this->decoded->body;
-            } else {
-                $this->body = "";
-            }
+            $this->body = isset($this->decoded->body) ? $this->decoded->body : "";
         }
 
         if ( preg_match("/begin ([0-7]{3}) (.+)\r?\n(.+)\r?\nend/Us", $this->body) > 0 ) {
