@@ -61,7 +61,9 @@ class Email_Parser
                 foreach ( $attachments as $attachment ) {
                     if ( $mime_type = $attachment->getContentType() ) {
                         if ( $this->is_valid_attachment($mime_type) ) {
-                            $this->save_attachment($attachment->getFilename(), $attachment->getMimePartStr(), $mime_type);
+                            if ( $contents = base64_decode($attachment->getMimePartStr()) ) {
+                                $this->save_attachment($attachment->getFilename(), $contents, $mime_type);
+                            }
                         }
                     }
                 }
