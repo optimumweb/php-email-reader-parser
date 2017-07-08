@@ -49,7 +49,7 @@ class Email_Parser
             }
 
             $this->body = $parser->getMessageBody('text');
-            $this->html = $parser->getMessageBody('body');
+            $this->html = $parser->getMessageBody('html');
 
             $attachments = $parser->getAttachments(true);
 
