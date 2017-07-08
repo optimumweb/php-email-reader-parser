@@ -14,6 +14,8 @@ class Email_Parser
     public $from        = null;
     public $from_email  = null;
     public $to          = null;
+    public $cc          = null;
+    public $reply_to    = null;
     public $subject     = null;
     public $date        = null;
     public $body        = "";
@@ -39,10 +41,12 @@ class Email_Parser
 
             $parser->setText($this->raw);
 
-            $this->from    = $parser->getHeader('from');
-            $this->to      = $parser->getHeader('to');
-            $this->subject = $parser->getHeader('subject');
-            $this->date    = $parser->getHeader('date');
+            $this->from     = $parser->getHeader('from');
+            $this->to       = $parser->getHeader('to');
+            $this->cc       = $parser->getHeader('cc');
+            $this->reply_to = $parser->getHeader('reply-to');
+            $this->subject  = $parser->getHeader('subject');
+            $this->date     = $parser->getHeader('date');
 
             if ( $this->from ) {
                 $this->from_email = preg_replace('/.*<(.*)>.*/', "$1", $this->from);
