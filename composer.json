@@ -5,7 +5,8 @@
     "require": {
         "php": ">=5.4.0",
         "ext-imap": "*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "php-mime-mail-parser/php-mime-mail-parser": "2.9.1"
     },
     "minimum-stability": "dev",
     "autoload": {

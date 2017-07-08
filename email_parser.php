@@ -1,7 +1,5 @@
 <?php
 
-require_once('Mail/mimeDecode.php');
-
 class Email_Parser
 {
     private $allowed_mime_types    = [];
@@ -29,116 +27,45 @@ class Email_Parser
         }
     }
 
-    public function parse($raw)
+    public function parse($raw = null)
     {
-        $this->raw = $raw;
-
-        // http://pear.php.net/manual/en/package.mail.mail-mimedecode.decode.php
-        $decoder = new Mail_mimeDecode($this->raw);
-
-        $this->decoded = $decoder->decode([
-            'decode_headers' => true,
-            'include_bodies' => true,
-            'decode_bodies'  => true
-        ]);
-
-        $this->from    = mb_convert_encoding($this->decoded->headers['from'],    $this->charset, $this->charset);
-        $this->to      = mb_convert_encoding($this->decoded->headers['to'],      $this->charset, $this->charset);
-        $this->subject = mb_convert_encoding($this->decoded->headers['subject'], $this->charset, $this->charset);
-        $this->date    = mb_convert_encoding($this->decoded->headers['date'],    $this->charset, $this->charset);
-
-        $this->from_email = preg_replace('/.*<(.*)>.*/', "$1", $this->from);
-
-        if ( isset($this->decoded->parts) && is_array($this->decoded->parts) ) {
-            foreach ( $this->decoded->parts as $idx => $body_part ) {
-                $this->decode_part($body_part);
-            }
+        if ( $raw !== null ) {
+            $this->raw = $raw;
         }
 
-        if ( isset($this->decoded->disposition) && $this->decoded->disposition == 'inline' ) {
-            $mime_type = "{$this->decoded->ctype_primary}/{$this->decoded->ctype_secondary}";
+        if ( $this->raw !== null ) {
 
-            if ( isset($this->decoded->d_parameters) && array_key_exists('filename', $this->decoded->d_parameters) ) {
-                $filename = $this->decoded->d_parameters['filename'];
-            } else {
-                $filename = 'file';
+            $parser = new PhpMimeMailParser\Parser;
+
+            $parser->setText($this->raw);
+
+            $this->from    = $parser->getHeader('from');
+            $this->to      = $parser->getHeader('to');
+            $this->subject = $parser->getHeader('subject');
+            $this->date    = $parser->getHeader('date');
+
+            if ( $this->from ) {
+                $this->from_email = preg_replace('/.*<(.*)>.*/', "$1", $this->from);
             }
 
-            if ( $this->is_valid_attachment($mime_type) ) {
-                $this->save_attachment($filename, $this->decoded->body, $mime_type);
-            }
+            $this->body = $parser->getMessageBody('text');
+            $this->html = $parser->getMessageBody('body');
 
-            $this->body = "";
-        }
+            $attachments = $parser->getAttachments(true);
 
-        // We might also have uuencoded files. Check for those.
-        if ( empty($this->body) ) {
-            $this->body = isset($this->decoded->body) ? $this->decoded->body : "";
-        }
-
-        if ( preg_match("/begin ([0-7]{3}) (.+)\r?\n(.+)\r?\nend/Us", $this->body) > 0 ) {
-            foreach ( $decoder->uudecode($this->body) as $file ) {
-                // $file = [ 'filename' => $filename, 'fileperm' => $fileperm, 'filedata' => $filedata ]
-                $this->save_attachment($file['filename'], $file['filedata']);
-            }
-            // Strip out all the uuencoded attachments from the body
-            while ( preg_match("/begin ([0-7]{3}) (.+)\r?\n(.+)\r?\nend/Us", $this->body) > 0 ) {
-                $this->body = preg_replace("/begin ([0-7]{3}) (.+)\r?\n(.+)\r?\nend/Us", "\n", $this->body);
-            }
-        }
-
-        $this->body = mb_convert_encoding($this->body, $this->charset, $this->charset);
-
-        return $this;
-    }
-
-    private function decode_part($body_part)
-    {
-        if ( isset($body_part->ctype_parameters) && is_array($body_part->ctype_parameters) ) {
-            if ( array_key_exists('name', $body_part->ctype_parameters) ) {
-                $filename = $body_part->ctype_parameters['name'];
-            } elseif ( array_key_exists('filename', $body_part->ctype_parameters) ) {
-                $filename = $body_part->ctype_parameters['filename'];
-            }
-        } elseif ( isset($body_part->d_parameters) && is_array($body_part->d_parameters) ) {
-            if ( array_key_exists('filename', $body_part->d_parameters) ) {
-                $filename = $body_part->d_parameters['filename'];
-            }
-        }
-        if ( !isset($filename) ) {
-            $filename = "file";
-        }
-
-        $mime_type = "{$body_part->ctype_primary}/{$body_part->ctype_secondary}";
-
-        if ( $this->debug ) {
-            print "Found body part type $mime_type\n";
-        }
-
-        if ( $body_part->ctype_primary == 'multipart' ) {
-            if ( is_array($body_part->parts) ) {
-                foreach ( $body_part->parts as $ix => $sub_part ) {
-                    $this->decode_part($sub_part);
+            if ( !empty($attachments) ) {
+                foreach ( $attachments as $attachment ) {
+                    if ( $mime_type = $attachment->getContentType() ) {
+                        if ( $this->is_valid_attachment($mime_type) ) {
+                            $this->save_attachment($attachment->getFilename(), $attachment->getMimePartStr(), $mime_type);
+                        }
+                    }
                 }
             }
-        } elseif ( !isset($body_part->disposition) || $body_part->disposition == 'inline' ) {
-            switch ( $mime_type ) {
-                case 'text/plain':
-                    $this->body .= mb_convert_encoding($body_part->body, $this->charset, $this->charset) . "\n";
-                    break;
-                case 'text/html':
-                    $this->html .= mb_convert_encoding($body_part->body, $this->charset, $this->charset) . "\n";
-                    break;
-                default:
-                    if ( $this->is_valid_attachment($mime_type) ) {
-                        $this->save_attachment($filename, $body_part->body, $mime_type);
-                    }
-            }
-        } else {
-            if ( $this->is_valid_attachment($mime_type) ) {
-                $this->save_attachment($filename, $body_part->body, $mime_type);
-            }
+
         }
+
+        return $this;
     }
 
     private function is_valid_attachment($mime_type)
@@ -153,9 +80,7 @@ class Email_Parser
 
     private function save_attachment($filename, $contents, $mime_type = 'unknown')
     {
-        $filename = mb_convert_encoding($filename, $this->charset, $this->charset);
-
-        $dot_ext = '.'.self::get_file_extension($filename);
+        $dot_ext = '.' . self::get_file_extension($filename);
 
         $unlocked_and_unique = false;
         $i = 0;
@@ -165,14 +90,13 @@ class Email_Parser
             $name = uniqid('email_attachment_');
             $path = sys_get_temp_dir() . '/' . $name . $dot_ext;
 
-            // Attempt to lock
-            $outfile = fopen($path, 'w');
-
-            if ( flock($outfile, LOCK_EX) ) {
-                $unlocked_and_unique = true;
-            } else {
-                flock($outfile, LOCK_UN);
-                fclose($outfile);
+            if ( $outfile = fopen($path, 'w') ) {
+                if ( flock($outfile, LOCK_EX) ) {
+                    $unlocked_and_unique = true;
+                } else {
+                    flock($outfile, LOCK_UN);
+                    fclose($outfile);
+                }
             }
 
         }
