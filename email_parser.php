@@ -21,6 +21,7 @@ class Email_Parser
     public $body        = "";
     public $html        = "";
     public $attachments = [];
+    public $attachment_paths = [];
 
     public function __construct($raw = null)
     {
@@ -56,6 +57,8 @@ class Email_Parser
             $this->html = $parser->getMessageBody('html');
 
             $attachment_paths = $parser->saveAttachments(sys_get_temp_dir());
+
+            $this->attachment_paths = $attachment_paths;
 
             $attachments = $parser->getAttachments(true);
 
