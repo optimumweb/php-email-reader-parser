@@ -55,9 +55,11 @@ class Email_Parser
             $this->body = $parser->getMessageBody('text');
             $this->html = $parser->getMessageBody('html');
 
-            $attachments = $parser->getAttachments(true);
+            $attachments = $parser->saveAttachments(sys_get_temp_dir());
 
-            if ( !empty($attachments) ) {
+            $this->attachments = $attachments;
+
+            /*if ( !empty($attachments) ) {
                 foreach ( $attachments as $attachment ) {
                     if ( $mime_type = $attachment->getContentType() ) {
                         if ( $this->is_valid_attachment($mime_type) ) {
@@ -67,7 +69,7 @@ class Email_Parser
                         }
                     }
                 }
-            }
+            }*/
 
         }
 
