@@ -56,7 +56,9 @@ class Email_Parser
             $this->body = $parser->getMessageBody('text');
             $this->html = $parser->getMessageBody('html');
 
-            $attachment_paths = $parser->saveAttachments(sys_get_temp_dir());
+            $attach_dir = sys_get_temp_dir() . '/';
+
+            $attachment_paths = $parser->saveAttachments($attach_dir);
 
             $this->attachment_paths = $attachment_paths;
 
