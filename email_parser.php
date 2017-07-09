@@ -55,21 +55,26 @@ class Email_Parser
             $this->body = $parser->getMessageBody('text');
             $this->html = $parser->getMessageBody('html');
 
-            $attachments = $parser->saveAttachments(sys_get_temp_dir());
+            $attachment_paths = $parser->saveAttachments(sys_get_temp_dir());
 
-            $this->attachments = $attachments;
+            $attachments = $parser->getAttachments(true);
 
-            /*if ( !empty($attachments) ) {
-                foreach ( $attachments as $attachment ) {
-                    if ( $mime_type = $attachment->getContentType() ) {
-                        if ( $this->is_valid_attachment($mime_type) ) {
-                            if ( $contents = base64_decode($attachment->getMimePartStr()) ) {
-                                $this->save_attachment($attachment->getFilename(), $contents, $mime_type);
+            if ( !empty($attachments) ) {
+                foreach ( $attachments as $i => $attachment ) {
+                    if ( array_key_exists($i, $attachment_paths) && $attachment_path = $attachment_paths[$i] ) {
+                        if ( $mime_type = $attachment->getContentType() ) {
+                            if ( $this->is_valid_attachment($mime_type) ) {
+                                $this->attachments[] = [
+                                    'name' => $attachment->getFilename(),
+                                    'path' => $attachment_path,
+                                    'size' => $this->format_bytes(filesize($attachment_path)),
+                                    'mime' => $mime_type
+                                ];
                             }
                         }
                     }
                 }
-            }*/
+            }
 
         }
 
@@ -84,44 +89,6 @@ class Email_Parser
             }
         }
         return false;
-    }
-
-    private function save_attachment($filename, $contents, $mime_type = 'unknown')
-    {
-        $dot_ext = '.' . self::get_file_extension($filename);
-
-        $unlocked_and_unique = false;
-        $i = 0;
-
-        while ( !$unlocked_and_unique && $i++ < 10 ) {
-
-            $name = uniqid('email_attachment_');
-            $path = sys_get_temp_dir() . '/' . $name . $dot_ext;
-
-            if ( $outfile = fopen($path, 'w') ) {
-                if ( flock($outfile, LOCK_EX) ) {
-                    $unlocked_and_unique = true;
-                } else {
-                    flock($outfile, LOCK_UN);
-                    fclose($outfile);
-                }
-            }
-
-        }
-
-        if ( isset($outfile) && $outfile !== false ) {
-            fwrite($outfile, $contents);
-            fclose($outfile);
-        }
-
-        if ( isset($name, $path) ) {
-            $this->attachments[] = [
-                'name' => $filename,
-                'path' => $path,
-                'size' => $this->format_bytes(filesize($path)),
-                'mime' => $mime_type
-            ];
-        }
     }
 
     public function plain()
