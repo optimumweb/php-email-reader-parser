@@ -103,7 +103,7 @@ class Email_Parser
 
         if ( !empty($text) ) {
             $plain  = strip_tags($text, '<style>'); // remove all tags but style tags
-            $substr = substr($plain, strpos($plain, "<style"), strpos($plain, "</style>") + 2); // take care of style tags manually to remove inline css
+            $substr = substr($plain, strpos($plain, "<style"), strpos($plain, "</style>")); // take care of style tags manually to remove inline css
             $plain  = str_replace($substr, "", $plain); // remove all css
             $plain  = str_replace([ "\t" ], "", $plain); // remove tabs
             $plain  = preg_replace("/\n\n+/", "\n\n", $plain); // remove excessive line-breaks that come from stripping tags
